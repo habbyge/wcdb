@@ -238,47 +238,38 @@ const Configs Database::defaultConfigs(
 
 void Database::setConfig(const std::string &name,
                          const Config &config,
-                         Configs::Order order)
-{
+                         Configs::Order order) {
     m_pool->setConfig(name, config, order);
 }
 
-void Database::setConfig(const std::string &name, const Config &config)
-{
+void Database::setConfig(const std::string &name, const Config &config) {
     m_pool->setConfig(name, config);
 }
 
-void Database::setCipher(const void *key, int keySize, int pageSize)
-{
-    std::shared_ptr<std::vector<unsigned char>> keys(
-        new std::vector<unsigned char>(keySize));
-    memcpy(keys->data(), key, keySize);
-    m_pool->setConfig(Database::defaultCipherConfigName,
-                      [keys, pageSize](std::shared_ptr<Handle> &handle,
-                                       Error &error) -> bool {
+void Database::setCipher(const void* key, int keySize, int pageSize) {
+  std::shared_ptr<std::vector<unsigned char>> keys(new std::vector<unsigned char>(keySize));
+  memcpy(keys->data(), key, keySize);
+        m_pool->setConfig(Database::defaultCipherConfigName,
+            [keys, pageSize](std::shared_ptr<Handle>& handle, Error& error) -> bool {
+                //Set Cipher Key
+                bool result = handle->setCipherKey(keys->data(), (int) keys->size());
+                if (!result) {
+                    error = handle->getError();
+                    return false;
+                }
 
-                          //Set Cipher Key
-                          bool result = handle->setCipherKey(
-                              keys->data(), (int) keys->size());
-                          if (!result) {
-                              error = handle->getError();
-                              return false;
-                          }
+                //Set Cipher Page Size
+                if (!handle->exec(StatementPragma().pragma(Pragma::CipherPageSize, pageSize))) {
+                    error = handle->getError();
+                    return false;
+                }
 
-                          //Set Cipher Page Size
-                          if (!handle->exec(StatementPragma().pragma(
-                                  Pragma::CipherPageSize, pageSize))) {
-                              error = handle->getError();
-                              return false;
-                          }
-
-                          error.reset();
-                          return true;
-                      });
+                error.reset();
+                return true;
+            });
 }
 
-void Database::setPerformanceTrace(const PerformanceTrace &trace)
-{
+void Database::setPerformanceTrace(const PerformanceTrace &trace) {
     m_pool->setConfig(
         Database::defaultTraceConfigName,
         [trace](std::shared_ptr<Handle> &handle, Error &error) -> bool {
@@ -287,8 +278,7 @@ void Database::setPerformanceTrace(const PerformanceTrace &trace)
         });
 }
 
-void Database::setSynchronousFull(bool full)
-{
+void Database::setSynchronousFull(bool full) {
     if (full) {
         m_pool->setConfig(
             Database::defaultSynchronousConfigName,
@@ -318,8 +308,7 @@ void Database::setSynchronousFull(bool full)
     }
 }
 
-void Database::setTokenizes(const std::list<std::string> &tokenizeNames)
-{
+void Database::setTokenizes(const std::list<std::string> &tokenizeNames) {
     m_pool->setConfig(
         Database::defaultTokenizeConfigName,
         [tokenizeNames](std::shared_ptr<Handle> &handle, Error &error) -> bool {
@@ -356,13 +345,11 @@ void Database::setTokenizes(const std::list<std::string> &tokenizeNames)
         });
 }
 
-void Database::SetGlobalPerformanceTrace(const PerformanceTrace &globalTrace)
-{
+void Database::SetGlobalPerformanceTrace(const PerformanceTrace &globalTrace) {
     s_globalPerformanceTrace.reset(new PerformanceTrace(globalTrace));
 }
 
-void Database::SetGlobalSQLTrace(const SQLTrace &globalTrace)
-{
+void Database::SetGlobalSQLTrace(const SQLTrace &globalTrace) {
     s_globalSQLTrace.reset(new SQLTrace(globalTrace));
 }
 

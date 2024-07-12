@@ -27,58 +27,45 @@ namespace WCDB {
 
 Database::Database(const std::string &thePath)
     : CoreBase(HandlePool::GetPool(thePath, Database::defaultConfigs),
-               CoreType::Database)
-{
-}
+               CoreType::Database) {}
 
 Database::Database(Tag tag)
-    : CoreBase(HandlePool::GetPool(tag), CoreType::Database)
-{
-}
+    : CoreBase(HandlePool::GetPool(tag), CoreType::Database) {}
 
-bool Database::canOpen()
-{
+bool Database::canOpen() {
     Error innerError;
     return !m_pool->isDrained() || m_pool->fillOne(innerError);
 }
 
-void Database::close(std::function<void(void)> onClosed)
-{
+void Database::close(std::function<void(void)> onClosed) {
     m_pool->drain(onClosed);
 }
 
-void Database::blockade()
-{
+void Database::blockade() {
     m_pool->blockade();
 }
 
-bool Database::isBlockaded()
-{
+bool Database::isBlockaded() {
     return m_pool->isBlockaded();
 }
 
-void Database::unblockade()
-{
+void Database::unblockade() {
     m_pool->unblockade();
 }
 
-bool Database::isOpened() const
-{
+bool Database::isOpened() const {
     return !m_pool->isDrained();
 }
 
-void Database::purgeFreeHandles()
-{
+void Database::purgeFreeHandles() {
     m_pool->purgeFreeHandles();
 }
 
-void Database::PurgeFreeHandlesInAllDatabases()
-{
+void Database::PurgeFreeHandlesInAllDatabases() {
     HandlePool::PurgeFreeHandlesInAllPool();
 }
 
-void Database::setTag(Tag tag)
-{
+void Database::setTag(Tag tag) {
     m_pool->tag = tag;
 }
 

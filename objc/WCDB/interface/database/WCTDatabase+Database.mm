@@ -52,8 +52,7 @@
     return self;
 }
 
-- (instancetype)initWithExistingTag:(WCTTag)tag
-{
+- (instancetype)initWithExistingTag:(WCTTag)tag {
     std::shared_ptr<WCDB::CoreBase> core(new WCDB::Database(tag));
     if (core->getType() != WCDB::CoreType::None) {
         if (self = [super initWithCore:core]) {
@@ -64,43 +63,35 @@
     return nil;
 }
 
-- (void)setCipherKey:(NSData *)cipherKey
-{
+- (void)setCipherKey:(NSData *)cipherKey {
     _database->setCipher(cipherKey.bytes, (int) cipherKey.length);
 }
 
-- (void)setCipherKey:(NSData *)cipherKey andCipherPageSize:(int)cipherPageSize
-{
+- (void)setCipherKey:(NSData *)cipherKey andCipherPageSize:(int)cipherPageSize {
     _database->setCipher(cipherKey.bytes, (int) cipherKey.length, cipherPageSize);
 }
 
-- (BOOL)canOpen
-{
+- (BOOL)canOpen {
     return _database->canOpen();
 }
 
-- (BOOL)isOpened
-{
+- (BOOL)isOpened {
     return _database->isOpened();
 }
 
-- (void)blockade
-{
+- (void)blockade {
     _database->blockade();
 }
 
-- (void)unblockade
-{
+- (void)unblockade {
     _database->unblockade();
 }
 
-- (void)close
-{
+- (void)close {
     _database->close(nullptr);
 }
 
-- (void)close:(WCTCloseBlock)onClosed
-{
+- (void)close:(WCTCloseBlock)onClosed {
     std::function<void(void)> callback = nullptr;
     if (onClosed) {
         callback = [onClosed]() {
@@ -110,23 +101,19 @@
     _database->close(callback);
 }
 
-- (void)purgeFreeHandles
-{
+- (void)purgeFreeHandles {
     _database->purgeFreeHandles();
 }
 
-+ (void)PurgeFreeHandlesInAllDatabases
-{
++ (void)PurgeFreeHandlesInAllDatabases {
     WCDB::Database::PurgeFreeHandlesInAllDatabases();
 }
 
-- (BOOL)isBlockaded
-{
+- (BOOL)isBlockaded {
     return _database->isBlockaded();
 }
 
-- (void)setTag:(WCDB::Tag)tag
-{
+- (void)setTag:(WCDB::Tag)tag {
     _database->setTag(tag);
 }
 

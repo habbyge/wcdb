@@ -27,7 +27,9 @@
 #include <WCDB/handle_pool.hpp>
 #include <WCDB/statement_recyclable.hpp>
 #include <WCDB/thread_local.hpp>
+
 #include <array>
+#include <string>
 
 namespace WCDB {
 

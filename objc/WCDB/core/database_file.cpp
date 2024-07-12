@@ -23,10 +23,12 @@
 #include <WCDB/path.hpp>
 #include <WCDB/utility.hpp>
 
+#include <stdint.h>
+#include <string>
+
 namespace WCDB {
 
-bool Database::removeFiles(Error &error)
-{
+bool Database::removeFiles(Error &error) {
     if (!isBlockaded() || isOpened()) {
         WCDB::Error::Warning(
             "Removing files on an opened database may cause unknown results");
@@ -34,8 +36,7 @@ bool Database::removeFiles(Error &error)
     return File::removeFiles(getPaths(), error);
 }
 
-size_t Database::getFilesSize(Error &error)
-{
+size_t Database::getFilesSize(Error &error) {
     if (!isBlockaded() || isOpened()) {
         WCDB::Error::Warning("Getting files size on an opened database may get "
                              "incorrect results");
@@ -43,8 +44,7 @@ size_t Database::getFilesSize(Error &error)
     return File::getFilesSize(getPaths(), error);
 }
 
-bool Database::moveFiles(const std::string &directory, Error &error)
-{
+bool Database::moveFiles(const std::string &directory, Error &error) {
     if (!isBlockaded() || isOpened()) {
         WCDB::Error::Warning("Moving files on an opened database may cause a "
                              "corrupted database");

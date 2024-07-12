@@ -369,9 +369,7 @@ sqliteWalHookCallback(void *data, sqlite3 *db, const char *dbName, int pages)
 }
 
 static void
-nativeSetKey(JNIEnv *env, jclass clazz, jlong connectionPtr, jbyteArray keyArr)
-{
-
+nativeSetKey(JNIEnv *env, jclass clazz, jlong connectionPtr, jbyteArray keyArr) {
     SQLiteConnection *connection =
         (SQLiteConnection *) (intptr_t) connectionPtr;
     if (!connection)
@@ -402,8 +400,7 @@ static jlong nativeOpen(JNIEnv *env,
                         jobject obj,
                         jstring pathStr,
                         jint openFlags,
-                        jstring vfsNameStr)
-{
+                        jstring vfsNameStr) {
     int sqliteFlags;
     if (openFlags & SQLiteConnection::CREATE_IF_NECESSARY) {
         sqliteFlags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE;
@@ -467,8 +464,7 @@ static jlong nativeOpen(JNIEnv *env,
     return (jlong)(intptr_t) connection;
 }
 
-static void nativeClose(JNIEnv *env, jclass clazz, jlong connectionPtr)
-{
+static void nativeClose(JNIEnv *env, jclass clazz, jlong connectionPtr) {
     SQLiteConnection *connection =
         (SQLiteConnection *) (intptr_t) connectionPtr;
 
@@ -489,8 +485,7 @@ static void nativeClose(JNIEnv *env, jclass clazz, jlong connectionPtr)
 // Called each time a custom function is evaluated.
 static void sqliteCustomFunctionCallback(sqlite3_context *context,
                                          int argc,
-                                         sqlite3_value **argv)
-{
+                                         sqlite3_value **argv) {
     JNIEnv *env = jniGetEnv();
 
     // Get the callback function object.
@@ -539,8 +534,7 @@ static void sqliteCustomFunctionCallback(sqlite3_context *context,
 }
 
 // Called when a custom function is destroyed.
-static void sqliteCustomFunctionDestructor(void *data)
-{
+static void sqliteCustomFunctionDestructor(void *data) {
     jobject functionObjGlobal = reinterpret_cast<jobject>(data);
 
     JNIEnv *env = jniGetEnv();

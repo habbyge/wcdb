@@ -43,8 +43,7 @@ extern int sqlcipher_set_default_hmac_algorithm(int algorithm);
 extern int sqlcipher_set_default_kdf_algorithm(int algorithm);
 
 
-static const struct option g_options[] =
-{
+static const struct option g_options[] = {
     {"help",            no_argument,        NULL, 'h'},
 	{"verbose",			no_argument,		NULL, 'v'},
 	{"output",			required_argument, 	NULL, 'o'},
@@ -58,8 +57,7 @@ static const struct option g_options[] =
 };
 
 
-static void usage(const char *argv0)
-{
+static void usage(const char *argv0) {
 	printf("USAGE:\n"
 		"  %1$s --output=<output_path> [OPTIONS] <db_path>\n"
 		"  %1$s --save-master=<master_path> [OPTIONS] <db_path>\n",
@@ -85,22 +83,19 @@ static void usage(const char *argv0)
 	exit(1);
 }
 
-static void print_log(sqliterk_loglevel level, int result, const char* msg)
-{
+static void print_log(sqliterk_loglevel level, int result, const char* msg) {
 	fputs(msg, stderr);
 	fputc('\n', stderr);
 }
 
-static void inline LOGI(const char *msg)
-{
+static void inline LOGI(const char *msg) {
 	print_log(sqliterk_loglevel_info, SQLITERK_OK, msg);
 }
 
-static void parse_options(int argc, char *argv[])
-{
+static void parse_options(int argc, char *argv[]) {
 	int opt;
 	int value;
-	
+
 	if (argc < 2) usage(argv[0]);
 
 	// default to SQLCipher version 1, for compatibility to KKDB.
@@ -108,15 +103,13 @@ static void parse_options(int argc, char *argv[])
 	sqlcipher_set_default_use_hmac(0);
 	sqlcipher_set_default_hmac_algorithm(0);
 	sqlcipher_set_default_kdf_algorithm(0);
-	
+
 	g_cipher_conf.use_hmac = -1;
 
 	// parse options
 	optind = 1;
-	while ((opt = getopt_long(argc, argv, "hvo:K:k:M:m:", g_options, NULL)) != -1)
-	{
-		switch (opt)
-		{
+	while ((opt = getopt_long(argc, argv, "hvo:K:k:M:m:", g_options, NULL)) != -1) {
+		switch (opt) {
         case 'h':   // help
             usage(argv[0]);
             break;
@@ -152,23 +145,16 @@ static void parse_options(int argc, char *argv[])
 			break;
 		case 0x100:	// version
 			value = atoi(optarg);
-			if (value == 1)
-			{
+			if (value == 1) {
 				sqlcipher_set_default_kdf_iter(4000);
 				sqlcipher_set_default_use_hmac(0);
-			}
-			else if (value == 2)
-			{
+			} else if (value == 2) {
 				sqlcipher_set_default_kdf_iter(4000);
 				sqlcipher_set_default_use_hmac(1);
-			}
-			else if (value == 3)
-			{
+			} else if (value == 3) {
 				sqlcipher_set_default_kdf_iter(64000);
 				sqlcipher_set_default_use_hmac(1);
-			}
-			else
-			{
+			} else {
 				LOGI("Version must be 1, 2 or 3");
 				exit(-1);
 			}
@@ -176,8 +162,7 @@ static void parse_options(int argc, char *argv[])
 		case 0x101:	// page-size
 			value = atoi(optarg);
 			if (value != 512 && value != 1024 && value != 2048 && value != 4096 &&
-					value != 8192 && value != 16384 && value != 32768 && value != 65536)
-			{
+					value != 8192 && value != 16384 && value != 32768 && value != 65536) {
 				LOGI("Page size must be 512, 1024, 2048, ..., or 65536");
 				exit(-1);
 			}
@@ -187,40 +172,36 @@ static void parse_options(int argc, char *argv[])
             usage(argv[0]);
 		}
 	}
-	
+
 	if (optind != argc - 1) 	// no database path
 		usage(argv[0]);
 	g_in_path = argv[optind++];
-	
-	if (g_save_master && (g_load_master || g_out_path))
-	{
+
+	if (g_save_master && (g_load_master || g_out_path)) {
 		LOGI("--save-master must be used without --load-master or --output.");
 		usage(argv[0]);
 	}
 
-	if (!g_out_path && !g_save_master)
-	{
+	if (!g_out_path && !g_save_master) {
 		LOGI("Output path must be specified.");
 		usage(argv[0]);
 	}
 }
 
-static uint8_t MASTER_KEY[] = { 0xdc, 0x1c, 0xbb, 0x92, 0xa1, 0xb1, 0xcb, 0x5b, 
+static uint8_t MASTER_KEY[] = { 0xdc, 0x1c, 0xbb, 0x92, 0xa1, 0xb1, 0xcb, 0x5b,
 	0x06, 0x5b, 0xf0, 0x5e, 0x05, 0x0e, 0xd9, 0x36 };
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	int ret;
 	sqlite3 *db;
 	sqliterk *rk;
-	
+
     sqliterk_os reg = { print_log };
     sqliterk_register(reg);
 
 	parse_options(argc, argv);
-	
-	if (g_save_master)
-	{
+
+	if (g_save_master) {
 		ret = sqlite3_open(g_in_path, &db);
 		if (ret != SQLITE_OK) return -3;
 		if (g_cipher_conf.key)
@@ -228,16 +209,13 @@ int main(int argc, char *argv[])
 
 		int out_key_len = g_out_key ? strlen(g_out_key) : 0;
 		ret = sqliterk_save_master(db, g_save_master, NULL, 0);
-		
+
 		sqlite3_close(db);
 		return (ret == SQLITERK_OK) ? 0 : -4;
-	}
-	else
-	{
+	} else {
 		sqliterk_master_info *master = NULL;
 		unsigned char salt[16];
-		if (g_load_master)
-		{
+		if (g_load_master) {
 			ret = sqliterk_load_master(g_load_master, MASTER_KEY, sizeof(MASTER_KEY), g_filter, g_num_filter,
 				&master, salt);
 			g_cipher_conf.kdf_salt = salt;

@@ -315,8 +315,7 @@ int run_schema_dump_query(struct callback_data *p, const char *zQuery)
 ** Make sure the database is open.  If it is not, then open it.  If
 ** the database fails to open, print an error message and exit.
 */
-int open_db(struct callback_data *p, const char *key)
-{
+int open_db(struct callback_data *p, const char *key) {
     if (p->db == 0) {
         int errcode = 0;
         sqlite3_initialize();
@@ -349,8 +348,7 @@ int open_db(struct callback_data *p, const char *key)
 
 int run_command_db_dump(const char *dbPath,
                         const char *dbKey,
-                        const char *outFile)
-{
+                        const char *outFile) {
     struct callback_data data, *p;
     p = &data;
 
@@ -436,8 +434,7 @@ static jboolean JNICALL nativeDumpDB(JNIEnv *env,
                                      jclass clazz,
                                      jstring dbPathStr,
                                      jstring keyStr,
-                                     jstring outPathStr)
-{
+                                     jstring outPathStr) {
     const char *dbPath = env->GetStringUTFChars(dbPathStr, nullptr);
     const char *key = nullptr;
     if (keyStr)
@@ -470,8 +467,7 @@ static const JNINativeMethod sMethods[] = {
     {"nativeIsSqlComplete", "(Ljava/lang/String;)Z",
      (void *) nativeIsSqlComplete}};
 
-static int register_wcdb_DBDumpUtil(JavaVM *vm, JNIEnv *env)
-{
+static int register_wcdb_DBDumpUtil(JavaVM *vm, JNIEnv *env) {
     return jniRegisterNativeMethods(env, "com/tencent/wcdb/repair/DBDumpUtil",
                                     sMethods, NELEM(sMethods));
 }

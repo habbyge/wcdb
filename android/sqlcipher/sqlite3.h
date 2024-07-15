@@ -5486,23 +5486,22 @@ SQLITE_API int sqlite3_create_collation(
   const char *zName,
   int eTextRep,
   void *pArg,
-  int(*xCompare)(void*,int,const void*,int,const void*)
-);
+  int(*xCompare)(void*,int,const void*,int,const void*));
+
 SQLITE_API int sqlite3_create_collation_v2(
   sqlite3*,
-  const char *zName, 
-  int eTextRep, 
+  const char *zName,
+  int eTextRep,
   void *pArg,
   int(*xCompare)(void*,int,const void*,int,const void*),
-  void(*xDestroy)(void*)
-);
+  void(*xDestroy)(void*));
+
 SQLITE_API int sqlite3_create_collation16(
-  sqlite3*, 
+  sqlite3*,
   const void *zName,
-  int eTextRep, 
+  int eTextRep,
   void *pArg,
-  int(*xCompare)(void*,int,const void*,int,const void*)
-);
+  int(*xCompare)(void*,int,const void*,int,const void*));
 
 /*
 ** CAPI3REF: Collation Needed Callbacks
@@ -5532,15 +5531,14 @@ SQLITE_API int sqlite3_create_collation16(
 ** [sqlite3_create_collation_v2()].
 */
 SQLITE_API int sqlite3_collation_needed(
-  sqlite3*, 
-  void*, 
-  void(*)(void*,sqlite3*,int eTextRep,const char*)
-);
+    sqlite3*,
+    void*,
+    void(*)(void*,sqlite3*,int eTextRep,const char*));
+
 SQLITE_API int sqlite3_collation_needed16(
-  sqlite3*, 
-  void*,
-  void(*)(void*,sqlite3*,int eTextRep,const void*)
-);
+    sqlite3*, 
+    void*,
+    void(*)(void*,sqlite3*,int eTextRep,const void*));
 
 #ifdef SQLITE_HAS_CODEC
 /*
@@ -5942,10 +5940,9 @@ SQLITE_API void *sqlite3_rollback_hook(sqlite3*, void(*)(void *), void*);
 ** and [sqlite3_preupdate_hook()] interfaces.
 */
 SQLITE_API void *sqlite3_update_hook(
-  sqlite3*, 
-  void(*)(void *,int ,char const *,char const *,sqlite3_int64),
-  void*
-);
+    sqlite3*,
+    void(*)(void *,int ,char const *,char const *,sqlite3_int64),
+    void*);
 
 /*
 ** CAPI3REF: Enable Or Disable Shared Pager Cache
@@ -6149,16 +6146,15 @@ SQLITE_API SQLITE_DEPRECATED void sqlite3_soft_heap_limit(int N);
 ** any errors are encountered while loading the schema.
 */
 SQLITE_API int sqlite3_table_column_metadata(
-  sqlite3 *db,                /* Connection handle */
-  const char *zDbName,        /* Database name or NULL */
-  const char *zTableName,     /* Table name */
-  const char *zColumnName,    /* Column name */
-  char const **pzDataType,    /* OUTPUT: Declared data type */
-  char const **pzCollSeq,     /* OUTPUT: Collation sequence name */
-  int *pNotNull,              /* OUTPUT: True if NOT NULL constraint exists */
-  int *pPrimaryKey,           /* OUTPUT: True if column part of PK */
-  int *pAutoinc               /* OUTPUT: True if column is auto-increment */
-);
+    sqlite3 *db,                /* Connection handle */
+    const char *zDbName,        /* Database name or NULL */
+    const char *zTableName,     /* Table name */
+    const char *zColumnName,    /* Column name */
+    char const **pzDataType,    /* OUTPUT: Declared data type */
+    char const **pzCollSeq,     /* OUTPUT: Collation sequence name */
+    int *pNotNull,              /* OUTPUT: True if NOT NULL constraint exists */
+    int *pPrimaryKey,           /* OUTPUT: True if column part of PK */
+    int *pAutoinc);               /* OUTPUT: True if column is auto-increment */
 
 /*
 ** CAPI3REF: Load An Extension
@@ -6205,11 +6201,10 @@ SQLITE_API int sqlite3_table_column_metadata(
 ** See also the [load_extension() SQL function].
 */
 SQLITE_API int sqlite3_load_extension(
-  sqlite3 *db,          /* Load the extension into this database connection */
-  const char *zFile,    /* Name of the shared library containing extension */
-  const char *zProc,    /* Entry point.  Derived from zFile if 0 */
-  char **pzErrMsg       /* Put error message here if not 0 */
-);
+    sqlite3 *db,          /* Load the extension into this database connection */
+    const char *zFile,    /* Name of the shared library containing extension */
+    const char *zProc,    /* Entry point.  Derived from zFile if 0 */
+    char **pzErrMsg);       /* Put error message here if not 0 */
 
 /*
 ** CAPI3REF: Enable Or Disable Extension Loading
@@ -6317,8 +6312,8 @@ typedef struct sqlite3_module sqlite3_module;
 ** CAPI3REF: Virtual Table Object
 ** KEYWORDS: sqlite3_module {virtual table module}
 **
-** This structure, sometimes called a "virtual table module", 
-** defines the implementation of a [virtual tables].  
+** This structure, sometimes called a "virtual table module",
+** defines the implementation of a [virtual tables].
 ** This structure consists mostly of methods for the module.
 **
 ** ^A virtual table module is created by filling in a persistent
@@ -6555,18 +6550,17 @@ struct sqlite3_index_info {
 ** destructor.
 */
 SQLITE_API int sqlite3_create_module(
-  sqlite3 *db,               /* SQLite connection to register module with */
-  const char *zName,         /* Name of the module */
-  const sqlite3_module *p,   /* Methods for the module */
-  void *pClientData          /* Client data for xCreate/xConnect */
-);
+    sqlite3 *db,               /* SQLite connection to register module with */
+    const char *zName,         /* Name of the module */
+    const sqlite3_module *p,   /* Methods for the module */
+    void *pClientData);          /* Client data for xCreate/xConnect */
+
 SQLITE_API int sqlite3_create_module_v2(
-  sqlite3 *db,               /* SQLite connection to register module with */
-  const char *zName,         /* Name of the module */
-  const sqlite3_module *p,   /* Methods for the module */
-  void *pClientData,         /* Client data for xCreate/xConnect */
-  void(*xDestroy)(void*)     /* Module destructor function */
-);
+    sqlite3 *db,               /* SQLite connection to register module with */
+    const char *zName,         /* Name of the module */
+    const sqlite3_module *p,   /* Methods for the module */
+    void *pClientData,         /* Client data for xCreate/xConnect */
+    void(*xDestroy)(void*));     /* Module destructor function */
 
 /*
 ** CAPI3REF: Virtual Table Instance Object
@@ -6630,7 +6624,7 @@ SQLITE_API int sqlite3_declare_vtab(sqlite3*, const char *zSQL);
 ** METHOD: sqlite3
 **
 ** ^(Virtual tables can provide alternative implementations of functions
-** using the [xFindFunction] method of the [virtual table module].  
+** using the [xFindFunction] method of the [virtual table module].
 ** But global versions of those functions
 ** must exist in order to be overloaded.)^
 **
@@ -6752,14 +6746,13 @@ typedef struct sqlite3_blob sqlite3_blob;
 ** [sqlite3_blob_bytes()], [sqlite3_blob_write()].
 */
 SQLITE_API int sqlite3_blob_open(
-  sqlite3*,
-  const char *zDb,
-  const char *zTable,
-  const char *zColumn,
-  sqlite3_int64 iRow,
-  int flags,
-  sqlite3_blob **ppBlob
-);
+    sqlite3*,
+    const char *zDb,
+    const char *zTable,
+    const char *zColumn,
+    sqlite3_int64 iRow,
+    int flags,
+    sqlite3_blob **ppBlob);
 
 /*
 ** CAPI3REF: Move a BLOB Handle to a New Row

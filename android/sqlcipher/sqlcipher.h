@@ -51,6 +51,9 @@
 #define SQLCIPHER_PBKDF2_HMAC_SHA512_LABEL "PBKDF2_HMAC_SHA512"
 
 
+// 这个里面主要存了一些加解密算法的实现函数的指针。可以通过宏选择加解密算法，
+// 这些算法都是利用第三方的开源加密库。比如 SQLCIPHER_CRYPTO_CC，
+// 可以选择 common crypto 算法，实现放在crypto_cc.c里。
 typedef struct {
   int (*activate)(void *ctx);
   int (*deactivate)(void *ctx);

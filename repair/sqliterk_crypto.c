@@ -113,8 +113,7 @@ const char *sqlcipher_codec_get_provider_version(codec_ctx *ctx);
 
 int sqliterkCryptoSetCipher(sqliterk_pager *pager,
                             sqliterk_file *fd,
-                            const sqliterk_cipher_conf *conf)
-{
+                            const sqliterk_cipher_conf *conf) {
     codec_ctx *codec = NULL;
     int rc;
 
@@ -202,16 +201,14 @@ bail:
     return rc;
 }
 
-void sqliterkCryptoFreeCodec(sqliterk_pager *pager)
-{
+void sqliterkCryptoFreeCodec(sqliterk_pager *pager) {
     if (!pager->codec)
         return;
     sqlcipher_codec_ctx_free(&pager->codec);
     sqlcipher_deactivate();
 }
 
-int sqliterkCryptoDecode(sqliterk_codec *codec, int pgno, void *data)
-{
+int sqliterkCryptoDecode(sqliterk_codec *codec, int pgno, void *data) {
     int rc;
     int offset = 0;
     unsigned char *pdata = (unsigned char *) data;

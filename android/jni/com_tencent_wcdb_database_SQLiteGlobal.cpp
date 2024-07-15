@@ -118,8 +118,7 @@ static int sqliteExtensionApiStealer(sqlite3 *db, const char **pzErrMsg,
 
 // Sets the global SQLite configuration.
 // This must be called before any other SQLite functions are called.
-static void sqliteInitialize()
-{
+static void sqliteInitialize() {
     // Enable multi-threaded mode.  In this mode, SQLite is safe to use by multiple
     // threads as long as no two threads use the same database connection at the same
     // time (which we guarantee in the SQLite database wrappers).

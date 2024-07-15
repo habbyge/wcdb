@@ -30,6 +30,7 @@
 
 #include <array>
 #include <string>
+#include <functional>
 
 namespace WCDB {
 

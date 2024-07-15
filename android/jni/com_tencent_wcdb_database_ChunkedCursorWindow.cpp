@@ -37,8 +37,7 @@
 
 namespace wcdb {
 
-static void throwExceptionWithRowCol(JNIEnv *env, jint row, jint column)
-{
+static void throwExceptionWithRowCol(JNIEnv *env, jint row, jint column) {
     char buf[256];
     snprintf(buf, sizeof(buf),
              "Couldn't read row %d, col %d from ChunkedCursorWindow.", row,
@@ -46,8 +45,7 @@ static void throwExceptionWithRowCol(JNIEnv *env, jint row, jint column)
     jniThrowException(env, "java/lang/IllegalStateException", buf);
 }
 
-static void throwUnknownTypeException(JNIEnv *env, jint type)
-{
+static void throwUnknownTypeException(JNIEnv *env, jint type) {
     char buf[128];
     snprintf(buf, sizeof(buf), "UNKNOWN type %d", type);
     jniThrowException(env, "java/lang/IllegalStateException", buf);
@@ -56,8 +54,7 @@ static void throwUnknownTypeException(JNIEnv *env, jint type)
 /****************************
      ChunkedCursorWindow
 *****************************/
-static jlong nativeCreate(JNIEnv *env, jclass cls, jint capacity)
-{
+static jlong nativeCreate(JNIEnv *env, jclass cls, jint capacity) {
     ChunkedCursorWindow *window;
 
     status_t status = ChunkedCursorWindow::create(capacity, &window);
@@ -71,16 +68,14 @@ static jlong nativeCreate(JNIEnv *env, jclass cls, jint capacity)
     return (jlong)(intptr_t) window;
 }
 
-static void nativeDispose(JNIEnv *env, jclass cls, jlong windowPtr)
-{
+static void nativeDispose(JNIEnv *env, jclass cls, jlong windowPtr) {
     ChunkedCursorWindow *window = (ChunkedCursorWindow *) (intptr_t) windowPtr;
 
     if (window)
         delete window;
 }
 
-static void nativeClear(JNIEnv *env, jclass cls, jlong windowPtr)
-{
+static void nativeClear(JNIEnv *env, jclass cls, jlong windowPtr) {
     ChunkedCursorWindow *window = (ChunkedCursorWindow *) (intptr_t) windowPtr;
 
     status_t status = window->clear();
@@ -90,8 +85,7 @@ static void nativeClear(JNIEnv *env, jclass cls, jlong windowPtr)
 }
 
 static jlong
-nativeRemoveChunk(JNIEnv *env, jclass cls, jlong windowPtr, jint pos)
-{
+nativeRemoveChunk(JNIEnv *env, jclass cls, jlong windowPtr, jint pos) {
     ChunkedCursorWindow *window = (ChunkedCursorWindow *) (intptr_t) windowPtr;
 
     uint32_t start, end;
@@ -102,23 +96,20 @@ nativeRemoveChunk(JNIEnv *env, jclass cls, jlong windowPtr, jint pos)
         return ((jlong) start << 32) | end;
 }
 
-static jint nativeGetNumChunks(JNIEnv *env, jclass cls, jlong windowPtr)
-{
+static jint nativeGetNumChunks(JNIEnv *env, jclass cls, jlong windowPtr) {
     ChunkedCursorWindow *window = (ChunkedCursorWindow *) (intptr_t) windowPtr;
     return window->getNumChunks();
 }
 
 static jboolean
-nativeSetNumColumns(JNIEnv *env, jclass cls, jlong windowPtr, jint columnNum)
-{
+nativeSetNumColumns(JNIEnv *env, jclass cls, jlong windowPtr, jint columnNum) {
     ChunkedCursorWindow *window = (ChunkedCursorWindow *) (intptr_t) windowPtr;
 
     status_t status = window->setNumColumns(columnNum);
     return status == OK;
 }
 
-static jlong nativeGetRow(JNIEnv *env, jclass cls, jlong windowPtr, jint pos)
-{
+static jlong nativeGetRow(JNIEnv *env, jclass cls, jlong windowPtr, jint pos) {
     if (pos < 0)
         return 0;
 
@@ -128,8 +119,7 @@ static jlong nativeGetRow(JNIEnv *env, jclass cls, jlong windowPtr, jint pos)
     return (jlong)(intptr_t) row;
 }
 
-static void nativeEndRow(JNIEnv *env, jclass cls, jlong windowPtr, jlong rowPtr)
-{
+static void nativeEndRow(JNIEnv *env, jclass cls, jlong windowPtr, jlong rowPtr) {
     ChunkedCursorWindow *window = (ChunkedCursorWindow *) (intptr_t) windowPtr;
     ChunkedCursorWindow::Row *row =
         (ChunkedCursorWindow::Row *) (intptr_t) rowPtr;
@@ -137,8 +127,7 @@ static void nativeEndRow(JNIEnv *env, jclass cls, jlong windowPtr, jlong rowPtr)
     window->endRow(row);
 }
 
-static jint nativeGetType(JNIEnv *env, jclass cls, jlong rowPtr, jint column)
-{
+static jint nativeGetType(JNIEnv *env, jclass cls, jlong rowPtr, jint column) {
     ChunkedCursorWindow::Row *row =
         (ChunkedCursorWindow::Row *) (intptr_t) rowPtr;
 
@@ -152,8 +141,7 @@ static jint nativeGetType(JNIEnv *env, jclass cls, jlong rowPtr, jint column)
 }
 
 static jbyteArray
-nativeGetBlob(JNIEnv *env, jclass cls, jlong rowPtr, jint column)
-{
+nativeGetBlob(JNIEnv *env, jclass cls, jlong rowPtr, jint column) {
     ChunkedCursorWindow::Row *row =
         (ChunkedCursorWindow::Row *) (intptr_t) rowPtr;
 
@@ -190,8 +178,7 @@ nativeGetBlob(JNIEnv *env, jclass cls, jlong rowPtr, jint column)
 }
 
 static jstring
-nativeGetString(JNIEnv *env, jclass cls, jlong rowPtr, jint column)
-{
+nativeGetString(JNIEnv *env, jclass cls, jlong rowPtr, jint column) {
     ChunkedCursorWindow::Row *row =
         (ChunkedCursorWindow::Row *) (intptr_t) rowPtr;
 
@@ -245,8 +232,7 @@ nativeGetString(JNIEnv *env, jclass cls, jlong rowPtr, jint column)
     }
 }
 
-static jlong nativeGetLong(JNIEnv *env, jclass cls, jlong rowPtr, jint column)
-{
+static jlong nativeGetLong(JNIEnv *env, jclass cls, jlong rowPtr, jint column) {
     ChunkedCursorWindow::Row *row =
         (ChunkedCursorWindow::Row *) (intptr_t) rowPtr;
 
@@ -277,8 +263,7 @@ static jlong nativeGetLong(JNIEnv *env, jclass cls, jlong rowPtr, jint column)
 }
 
 static jdouble
-nativeGetDouble(JNIEnv *env, jclass clazz, jlong rowPtr, jint column)
-{
+nativeGetDouble(JNIEnv *env, jclass clazz, jlong rowPtr, jint column) {
     ChunkedCursorWindow::Row *row =
         (ChunkedCursorWindow::Row *) (intptr_t) rowPtr;
 
@@ -314,8 +299,7 @@ nativeGetDouble(JNIEnv *env, jclass clazz, jlong rowPtr, jint column)
 static status_t copyRow(sqlite3_stmt *statement,
                         ChunkedCursorWindow::Row *row,
                         int numColumns,
-                        int pos)
-{
+                        int pos) {
 
     status_t status;
 
@@ -380,8 +364,7 @@ static jint nativeFillRows(JNIEnv *env,
                            jlong statementPtr,
                            jlong windowPtr,
                            jint startPos,
-                           jint count)
-{
+                           jint count) {
 
     sqlite3_stmt *stmt = (sqlite3_stmt *) (intptr_t) statementPtr;
     ChunkedCursorWindow *window = (ChunkedCursorWindow *) (intptr_t) windowPtr;
@@ -452,8 +435,7 @@ static jint nativeFillRows(JNIEnv *env,
     return i;
 }
 
-static jint nativeCount(JNIEnv *env, jclass cls, jlong statementPtr)
-{
+static jint nativeCount(JNIEnv *env, jclass cls, jlong statementPtr) {
     sqlite3_stmt *stmt = (sqlite3_stmt *) (intptr_t) statementPtr;
     int result = 0;
     while (sqlite3_step(stmt) == SQLITE_ROW) {
@@ -489,8 +471,7 @@ static const JNINativeMethod sQueryMethods[] = {
     {"nativeCount", "(J)I", (void *) nativeCount},
 };
 
-static jint register_wcdb_ChunkedCursorWindow(JavaVM *vm, JNIEnv *env)
-{
+static jint register_wcdb_ChunkedCursorWindow(JavaVM *vm, JNIEnv *env) {
     int ret = jniRegisterNativeMethods(
         env, "com/tencent/wcdb/database/ChunkedCursorWindow", sWindowMethods,
         NELEM(sWindowMethods));

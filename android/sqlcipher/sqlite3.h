@@ -34,6 +34,8 @@
 #define SQLITE3_H
 #include <stdarg.h>     /* Needed for the definition of va_list */
 
+#define SQLITE_HAS_CODEC // TODO(GXL)
+
 /*
 ** Make sure we can call this stuff from C++.
 */
@@ -108,7 +110,7 @@ extern "C" {
 ** be held constant and Z will be incremented or else Y will be incremented
 ** and Z will be reset to zero.
 **
-** Since [version 3.6.18] ([dateof:3.6.18]), 
+** Since [version 3.6.18] ([dateof:3.6.18]),
 ** SQLite source code has been stored in the
 ** <a href="http://www.fossil-scm.org/">Fossil configuration management
 ** system</a>.  ^The SQLITE_SOURCE_ID macro evaluates to
@@ -5392,8 +5394,8 @@ SQLITE_API int sqlite3_result_zeroblob64(sqlite3_context*, sqlite3_uint64 n);
 ** METHOD: sqlite3_context
 **
 ** The sqlite3_result_subtype(C,T) function causes the subtype of
-** the result from the [application-defined SQL function] with 
-** [sqlite3_context] C to be the value T.  Only the lower 8 bits 
+** the result from the [application-defined SQL function] with
+** [sqlite3_context] C to be the value T.  Only the lower 8 bits
 ** of the subtype T are preserved in current versions of SQLite;
 ** higher order bits are discarded.
 ** The number of subtype bytes preserved by SQLite might increase
@@ -5440,7 +5442,7 @@ SQLITE_API void sqlite3_result_subtype(sqlite3_context*,unsigned int);
 ** deleted.  ^When all collating functions having the same name are deleted,
 ** that collation is no longer usable.
 **
-** ^The collating function callback is invoked with a copy of the pArg 
+** ^The collating function callback is invoked with a copy of the pArg
 ** application data pointer and with two strings in the encoding specified
 ** by the eTextRep argument.  The collating function must return an
 ** integer that is negative, zero, or positive
@@ -5470,13 +5472,13 @@ SQLITE_API void sqlite3_result_subtype(sqlite3_context*,unsigned int);
 ** calls to the collation creation functions or when the
 ** [database connection] is closed using [sqlite3_close()].
 **
-** ^The xDestroy callback is <u>not</u> called if the 
+** ^The xDestroy callback is <u>not</u> called if the
 ** sqlite3_create_collation_v2() function fails.  Applications that invoke
-** sqlite3_create_collation_v2() with a non-NULL xDestroy argument should 
+** sqlite3_create_collation_v2() with a non-NULL xDestroy argument should
 ** check the return code and dispose of the application data pointer
 ** themselves rather than expecting SQLite to deal with it for them.
-** This is different from every other SQLite interface.  The inconsistency 
-** is unfortunate but cannot be changed without breaking backwards 
+** This is different from every other SQLite interface.  The inconsistency
+** is unfortunate but cannot be changed without breaking backwards
 ** compatibility.
 **
 ** See also:  [sqlite3_collation_needed()] and [sqlite3_collation_needed16()].
@@ -5536,7 +5538,7 @@ SQLITE_API int sqlite3_collation_needed(
     void(*)(void*,sqlite3*,int eTextRep,const char*));
 
 SQLITE_API int sqlite3_collation_needed16(
-    sqlite3*, 
+    sqlite3*,
     void*,
     void(*)(void*,sqlite3*,int eTextRep,const void*));
 
@@ -5549,14 +5551,13 @@ SQLITE_API int sqlite3_collation_needed16(
 ** of SQLite.
 */
 SQLITE_API int sqlite3_key(
-  sqlite3 *db,                   /* Database to be rekeyed */
-  const void *pKey, int nKey     /* The key */
-);
+    sqlite3 *db,                   /* Database to be rekeyed */
+    const void *pKey, int nKey);   /* The key */
+
 SQLITE_API int sqlite3_key_v2(
-  sqlite3 *db,                   /* Database to be rekeyed */
-  const char *zDbName,           /* Name of the database */
-  const void *pKey, int nKey     /* The key */
-);
+    sqlite3 *db,                   /* Database to be rekeyed */
+    const char *zDbName,           /* Name of the database */
+    const void *pKey, int nKey);   /* The key */
 
 /*
 ** Change the key on an open database.  If the current database is not
@@ -5583,32 +5584,27 @@ SQLITE_API int sqlite3_key_v2(
    END SQLCIPHER
 */
 SQLITE_API int sqlite3_rekey(
-  sqlite3 *db,                   /* Database to be rekeyed */
-  const void *pKey, int nKey     /* The new key */
-);
+    sqlite3 *db,                   /* Database to be rekeyed */
+    const void *pKey, int nKey);   /* The new key */
+
 SQLITE_API int sqlite3_rekey_v2(
-  sqlite3 *db,                   /* Database to be rekeyed */
-  const char *zDbName,           /* Name of the database */
-  const void *pKey, int nKey     /* The new key */
-);
+    sqlite3 *db,                   /* Database to be rekeyed */
+    const char *zDbName,           /* Name of the database */
+    const void *pKey, int nKey);   /* The new key */
 
 /*
-** Specify the activation key for a SEE database.  Unless 
+** Specify the activation key for a SEE database.  Unless
 ** activated, none of the SEE routines will work.
 */
-SQLITE_API void sqlite3_activate_see(
-  const char *zPassPhrase        /* Activation phrase */
-);
+SQLITE_API void sqlite3_activate_see(const char *zPassPhrase); /* Activation phrase */
 #endif
 
 #ifdef SQLITE_ENABLE_CEROD
 /*
-** Specify the activation key for a CEROD database.  Unless 
+** Specify the activation key for a CEROD database.  Unless
 ** activated, none of the CEROD routines will work.
 */
-SQLITE_API void sqlite3_activate_cerod(
-  const char *zPassPhrase        /* Activation phrase */
-);
+SQLITE_API void sqlite3_activate_cerod(const char *zPassPhrase); /* Activation phrase */
 #endif
 
 /*
@@ -9180,17 +9176,17 @@ SQLITE_API SQLITE_EXPERIMENTAL void sqlite3_snapshot_free(sqlite3_snapshot*);
 ** METHOD: sqlite3_snapshot
 **
 ** The sqlite3_snapshot_cmp(P1, P2) interface is used to compare the ages
-** of two valid snapshot handles. 
+** of two valid snapshot handles.
 **
-** If the two snapshot handles are not associated with the same database 
-** file, the result of the comparison is undefined. 
+** If the two snapshot handles are not associated with the same database
+** file, the result of the comparison is undefined.
 **
 ** Additionally, the result of the comparison is only valid if both of the
 ** snapshot handles were obtained by calling sqlite3_snapshot_get() since the
 ** last time the wal file was deleted. The wal file is deleted when the
 ** database is changed back to rollback mode or when the number of database
-** clients drops to zero. If either snapshot handle was obtained before the 
-** wal file was last deleted, the value returned by this function 
+** clients drops to zero. If either snapshot handle was obtained before the
+** wal file was last deleted, the value returned by this function
 ** is undefined.
 **
 ** Otherwise, this API returns a negative value if P1 refers to an older
@@ -9201,9 +9197,8 @@ SQLITE_API SQLITE_EXPERIMENTAL void sqlite3_snapshot_free(sqlite3_snapshot*);
 ** [SQLITE_ENABLE_SNAPSHOT] option.
 */
 SQLITE_API SQLITE_EXPERIMENTAL int sqlite3_snapshot_cmp(
-  sqlite3_snapshot *p1,
-  sqlite3_snapshot *p2
-);
+    sqlite3_snapshot *p1,
+    sqlite3_snapshot *p2);
 
 /*
 ** CAPI3REF: Recover snapshots from a wal file
@@ -9255,7 +9250,7 @@ SQLITE_API SQLITE_EXPERIMENTAL int sqlite3_snapshot_recover(sqlite3 *db, const c
 ** representation of the database will usually only exist if there has
 ** been a prior call to [sqlite3_deserialize(D,S,...)] with the same
 ** values of D and S.
-** The size of the database is written into *P even if the 
+** The size of the database is written into *P even if the
 ** SQLITE_SERIALIZE_NOCOPY bit is set but no contiguous copy
 ** of the database exists.
 **
@@ -9270,8 +9265,7 @@ SQLITE_API unsigned char *sqlite3_serialize(
   sqlite3 *db,           /* The database connection */
   const char *zSchema,   /* Which DB to serialize. ex: "main", "temp", ... */
   sqlite3_int64 *piSize, /* Write size of the DB here, if not NULL */
-  unsigned int mFlags    /* Zero or more SQLITE_SERIALIZE_* flags */
-);
+  unsigned int mFlags);    /* Zero or more SQLITE_SERIALIZE_* flags */
 
 /*
 ** CAPI3REF: Flags for sqlite3_serialize
@@ -9292,7 +9286,7 @@ SQLITE_API unsigned char *sqlite3_serialize(
 /*
 ** CAPI3REF: Deserialize a database
 **
-** The sqlite3_deserialize(D,S,P,N,M,F) interface causes the 
+** The sqlite3_deserialize(D,S,P,N,M,F) interface causes the
 ** [database connection] D to disconnect from database S and then
 ** reopen S as an in-memory database based on the serialization contained
 ** in P.  The serialized database P is N bytes in size.  M is the size of
@@ -9324,8 +9318,7 @@ SQLITE_API int sqlite3_deserialize(
   unsigned char *pData,   /* The serialized database content */
   sqlite3_int64 szDb,     /* Number bytes in the deserialization */
   sqlite3_int64 szBuf,    /* Total size of buffer pData[] */
-  unsigned mFlags         /* Zero or more SQLITE_DESERIALIZE_* flags */
-);
+  unsigned mFlags);       /* Zero or more SQLITE_DESERIALIZE_* flags */
 
 /*
 ** CAPI3REF: Flags for sqlite3_deserialize()
@@ -9406,11 +9399,10 @@ typedef struct sqlite3_rtree_query_info sqlite3_rtree_query_info;
 **   SELECT ... FROM <rtree> WHERE <rtree col> MATCH $zGeom(... params ...)
 */
 SQLITE_API int sqlite3_rtree_geometry_callback(
-  sqlite3 *db,
-  const char *zGeom,
-  int (*xGeom)(sqlite3_rtree_geometry*, int, sqlite3_rtree_dbl*,int*),
-  void *pContext
-);
+    sqlite3 *db,
+    const char *zGeom,
+    int (*xGeom)(sqlite3_rtree_geometry*, int, sqlite3_rtree_dbl*,int*),
+    void *pContext);
 
 
 /*
@@ -9432,12 +9424,11 @@ struct sqlite3_rtree_geometry {
 **   SELECT ... FROM <rtree> WHERE <rtree col> MATCH $zQueryFunc(... params ...)
 */
 SQLITE_API int sqlite3_rtree_query_callback(
-  sqlite3 *db,
-  const char *zQueryFunc,
-  int (*xQueryFunc)(sqlite3_rtree_query_info*),
-  void *pContext,
-  void (*xDestructor)(void*)
-);
+    sqlite3 *db,
+    const char *zQueryFunc,
+    int (*xQueryFunc)(sqlite3_rtree_query_info*),
+    void *pContext,
+    void (*xDestructor)(void*));
 
 
 /*
@@ -9547,20 +9538,19 @@ typedef struct sqlite3_changeset_iter sqlite3_changeset_iter;
 SQLITE_API int sqlite3session_create(
   sqlite3 *db,                    /* Database handle */
   const char *zDb,                /* Name of db (e.g. "main") */
-  sqlite3_session **ppSession     /* OUT: New session object */
-);
+  sqlite3_session **ppSession);   /* OUT: New session object */
 
 /*
 ** CAPI3REF: Delete A Session Object
 ** DESTRUCTOR: sqlite3_session
 **
-** Delete a session object previously allocated using 
+** Delete a session object previously allocated using
 ** [sqlite3session_create()]. Once a session object has been deleted, the
 ** results of attempting to use pSession with any other session module
 ** function are undefined.
 **
 ** Session objects must be deleted before the database handle to which they
-** are attached is closed. Refer to the documentation for 
+** are attached is closed. Refer to the documentation for
 ** [sqlite3session_create()] for details.
 */
 SQLITE_API void sqlite3session_delete(sqlite3_session *pSession);
@@ -9578,10 +9568,10 @@ SQLITE_API void sqlite3session_delete(sqlite3_session *pSession);
 ** the eventual changesets.
 **
 ** Passing zero to this function disables the session. Passing a value
-** greater than zero enables it. Passing a value less than zero is a 
+** greater than zero enables it. Passing a value less than zero is a
 ** no-op, and may be used to query the current state of the session.
 **
-** The return value indicates the final state of the session object: 0 if 
+** The return value indicates the final state of the session object: 0 if
 ** the session is disabled, or 1 if it is enabled.
 */
 SQLITE_API int sqlite3session_enable(sqlite3_session *pSession, int bEnable);
@@ -9596,7 +9586,7 @@ SQLITE_API int sqlite3session_enable(sqlite3_session *pSession, int bEnable);
 ** <ul>
 **   <li> The session object "indirect" flag is set when the change is
 **        made, or
-**   <li> The change is made by an SQL trigger or foreign key action 
+**   <li> The change is made by an SQL trigger or foreign key action
 **        instead of directly as a result of a users SQL statement.
 ** </ul>
 **
@@ -9608,10 +9598,10 @@ SQLITE_API int sqlite3session_enable(sqlite3_session *pSession, int bEnable);
 ** flag.  If the second argument passed to this function is zero, then the
 ** indirect flag is cleared. If it is greater than zero, the indirect flag
 ** is set. Passing a value less than zero does not modify the current value
-** of the indirect flag, and may be used to query the current state of the 
+** of the indirect flag, and may be used to query the current state of the
 ** indirect flag for the specified session object.
 **
-** The return value indicates the final state of the indirect flag: 0 if 
+** The return value indicates the final state of the indirect flag: 0 if
 ** it is clear, or 1 if it is set.
 */
 SQLITE_API int sqlite3session_indirect(sqlite3_session *pSession, int bIndirect);
@@ -9695,8 +9685,7 @@ SQLITE_API void sqlite3session_table_filter(
     void *pCtx,                   /* Copy of third arg to _filter_table() */
     const char *zTab              /* Table name */
   ),
-  void *pCtx                      /* First argument passed to xFilter */
-);
+  void *pCtx);                    /* First argument passed to xFilter */
 
 /*
 ** CAPI3REF: Generate A Changeset From A Session Object
@@ -11405,7 +11394,7 @@ struct Fts5PhraseIter {
 **   xPhraseFirstColumn() may also be obtained using xPhraseFirst/xPhraseNext
 **   (or xInst/xInstCount). The chief advantage of this API is that it is
 **   significantly more efficient than those alternatives when used with
-**   "detail=column" tables.  
+**   "detail=column" tables.
 **
 ** xPhraseNextColumn()
 **   See xPhraseFirstColumn above.
@@ -11419,11 +11408,10 @@ struct Fts5ExtensionApi {
   int (*xRowCount)(Fts5Context*, sqlite3_int64 *pnRow);
   int (*xColumnTotalSize)(Fts5Context*, int iCol, sqlite3_int64 *pnToken);
 
-  int (*xTokenize)(Fts5Context*, 
+  int (*xTokenize)(Fts5Context*,
     const char *pText, int nText, /* Text to tokenize */
     void *pCtx,                   /* Context passed to xToken() */
-    int (*xToken)(void*, int, const char*, int, int, int)       /* Callback */
-  );
+    int (*xToken)(void*, int, const char*, int, int, int)); /* Callback */
 
   int (*xPhraseCount)(Fts5Context*);
   int (*xPhraseSize)(Fts5Context*, int iPhrase);

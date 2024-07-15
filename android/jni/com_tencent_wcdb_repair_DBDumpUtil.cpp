@@ -310,25 +310,23 @@ int run_schema_dump_query(struct callback_data *p, const char *zQuery) {
 ** Make sure the database is open.  If it is not, then open it.  If
 ** the database fails to open, print an error message and exit.
 */
-int open_db(struct callback_data *p, const char *key) {
+int open_db(struct callback_data* p, const char* key) {
     if (p->db == 0) {
         int errcode = 0;
         sqlite3_initialize();
         errcode = sqlite3_open(p->zDbFilename, &p->db);
-        if (errcode != SQLITE_DONE && errcode != SQLITE_OK &&
-            errcode != SQLITE_ROW) {
+        if (errcode != SQLITE_DONE && errcode != SQLITE_OK && errcode != SQLITE_ROW) {
             LOGE(LOG_TAG, "Error: in sqlite3_open ");
             return -1;
         }
         if (key) {
             errcode = sqlite3_key(p->db, key, 7);
-            if (errcode != SQLITE_DONE && errcode != SQLITE_OK &&
-                errcode != SQLITE_ROW) {
+            if (errcode != SQLITE_DONE && errcode != SQLITE_OK && errcode != SQLITE_ROW) {
                 LOGE(LOG_TAG, "Error: setKey ");
                 return -1;
             }
         }
-        sqlite3 *db = p->db;
+        sqlite3* db = p->db;
         if (db == 0 || SQLITE_OK != sqlite3_errcode(db)) {
             LOGE(LOG_TAG, "Error: unable to open database \"%s\": %s\n",
                  p->zDbFilename, sqlite3_errmsg(db));

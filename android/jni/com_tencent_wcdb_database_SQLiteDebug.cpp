@@ -72,8 +72,7 @@ static void nativeSetIOTraceFlags(JNIEnv *env, jclass cls, jint flags)
 static void nativeGetIOTraceStats(JNIEnv *env,
                                   jclass cls,
                                   jlong connectionPtr,
-                                  jobject statsList)
-{
+                                  jobject statsList) {
     struct {
         jfieldID dbName;
         jfieldID path;

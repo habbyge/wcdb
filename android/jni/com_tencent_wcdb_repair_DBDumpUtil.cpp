@@ -80,8 +80,7 @@ struct callback_data {
     ** If the third argument, quote, is not '\0', then it is used as a
     ** quote character for zAppend.
     */
-char *appendText(char *zIn, char const *zAppend, char quote)
-{
+char *appendText(char *zIn, char const *zAppend, char quote) {
     int len;
     int i;
     int nAppend = strlen(zAppend);
@@ -130,11 +129,9 @@ char *appendText(char *zIn, char const *zAppend, char quote)
     ** won't consume the semicolon terminator.
     */
 int run_table_dump_query(
-    struct callback_data *p, /* Query context */
-    const char *zSelect,     /* SELECT statement to extract content */
-    const char *zFirstRow    /* Print before first row, if not NULL */
-    )
-{
+        struct callback_data *p, /* Query context */
+        const char *zSelect,     /* SELECT statement to extract content */
+        const char *zFirstRow) {    /* Print before first row, if not NULL */
     sqlite3_stmt *pSelect;
     int rc;
     int nResult;
@@ -186,8 +183,7 @@ int run_table_dump_query(
     ** the table type ("index" or "table") and SQL to create the table.
     ** This routine should print text sufficient to recreate the table.
     */
-int dump_callback(void *pArg, int nArg, char **azArg, char **azCol)
-{
+int dump_callback(void *pArg, int nArg, char **azArg, char **azCol) {
     int rc;
     const char *zTable;
     const char *zType;
@@ -281,8 +277,7 @@ int dump_callback(void *pArg, int nArg, char **azArg, char **azCol)
     return 0;
 }
 
-int run_schema_dump_query(struct callback_data *p, const char *zQuery)
-{
+int run_schema_dump_query(struct callback_data *p, const char *zQuery) {
     int rc;
     char *zErr = 0;
     rc = sqlite3_exec(p->db, zQuery, dump_callback, p, &zErr);
@@ -451,8 +446,7 @@ static jboolean JNICALL nativeDumpDB(JNIEnv *env,
     return (rc < 0) ? JNI_FALSE : JNI_TRUE;
 }
 
-static jboolean nativeIsSqlComplete(JNIEnv *env, jclass clazz, jstring sqlStr)
-{
+static jboolean nativeIsSqlComplete(JNIEnv *env, jclass clazz, jstring sqlStr) {
     const char *sql = env->GetStringUTFChars(sqlStr, nullptr);
     int rc = sqlite3_complete(sql);
     env->ReleaseStringUTFChars(sqlStr, sql);

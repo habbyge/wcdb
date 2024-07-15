@@ -44,8 +44,7 @@ static JNINativeMethod sMethods[] = {
         {"nativeInitialize", "(JJ)V", (void *) nativeInitialize},
 };
 
-static int register_extension_MMFtsTokenizer(JavaVM *vm, JNIEnv *env)
-{
+static int register_extension_MMFtsTokenizer(JavaVM *vm, JNIEnv *env) {
     return jniRegisterNativeMethods(env,
                                     "com/tencent/wcdb/extension/fts/MMFtsTokenizer",
                                     sMethods, NELEM(sMethods));

@@ -34,8 +34,7 @@ namespace wcdb {
 
 static jmethodID sMID_onProgress = nullptr;
 
-static sqliterk_cipher_conf *parseCipherSpec(JNIEnv *env, jobject cipherSpec)
-{
+static sqliterk_cipher_conf *parseCipherSpec(JNIEnv *env, jobject cipherSpec) {
     sqliterk_cipher_conf *result = nullptr;
     jfieldID fidKdfIteration;
     jfieldID fidHmacEnabled;
@@ -85,8 +84,7 @@ static JNICALL jlong nativeInit(JNIEnv *env,
                                 jstring pathStr,
                                 jbyteArray keyArr,
                                 jobject cipherSpec,
-                                jbyteArray saltArr)
-{
+                                jbyteArray saltArr) {
 
     sqliterk *rk = nullptr;
     sqliterk_cipher_conf *conf = parseCipherSpec(env, cipherSpec);
@@ -123,8 +121,7 @@ static JNICALL jlong nativeInit(JNIEnv *env,
     return (rc == SQLITERK_OK) ? (jlong)(intptr_t) rk : 0;
 }
 
-static JNICALL void nativeFini(JNIEnv *env, jclass cls, jlong rkPtr)
-{
+static JNICALL void nativeFini(JNIEnv *env, jclass cls, jlong rkPtr) {
     sqliterk *rk = (sqliterk *) (intptr_t) rkPtr;
     sqliterk_close(rk);
 }
@@ -136,8 +133,7 @@ struct callback_data {
     int last_root;
 };
 
-static int output_callback(void *user, sqliterk *rk, sqliterk_table *table, sqliterk_column *column)
-{
+static int output_callback(void *user, sqliterk *rk, sqliterk_table *table, sqliterk_column *column) {
     callback_data *d = (callback_data *) user;
     const char *table_name = sqliterk_table_name(table);
     int root = sqliterk_table_root(table);
@@ -145,7 +141,7 @@ static int output_callback(void *user, sqliterk *rk, sqliterk_table *table, sqli
     if (d->last_root != root) {
         if (d->last_table)
             d->env->DeleteLocalRef(d->last_table);
-        
+
         d->last_table = d->env->NewStringUTF(table_name);
         d->last_root = root;
     }
@@ -169,8 +165,7 @@ static JNICALL jint nativeOutput(JNIEnv *env,
                                      jlong rkPtr,
                                      jlong dbPtr,
                                      jlong masterPtr,
-                                     jint flags)
-{
+                                     jint flags) {
     sqliterk *rk = (sqliterk *) (intptr_t) rkPtr;
     sqlite3 *db = (sqlite3 *) (intptr_t) dbPtr;
     sqliterk_master_info *master =
@@ -181,34 +176,30 @@ static JNICALL jint nativeOutput(JNIEnv *env,
     data.obj = obj;
     data.last_table = nullptr;
     data.last_root = 0;
-    
+
     int rc = sqliterk_output_cb(rk, db, master, flags, output_callback, &data);
     if (rc == SQLITERK_OK) return 0;
     if (rc == SQLITERK_CANCELLED) return 1;
     return -1;
 }
 
-static JNICALL void nativeCancel(JNIEnv *env, jclass cls, jlong rkPtr)
-{
+static JNICALL void nativeCancel(JNIEnv *env, jclass cls, jlong rkPtr) {
     sqliterk *rk = (sqliterk *) (intptr_t) rkPtr;
     sqliterk_cancel(rk);
 }
 
-static JNICALL jint nativeIntegrityFlags(JNIEnv *env, jclass cls, jlong rkPtr)
-{
+static JNICALL jint nativeIntegrityFlags(JNIEnv *env, jclass cls, jlong rkPtr) {
     sqliterk *rk = (sqliterk *) (intptr_t) rkPtr;
     return (jint) sqliterk_integrity(rk);
 }
 
-static JNICALL jstring nativeLastError(JNIEnv *env, jclass cls)
-{
+static JNICALL jstring nativeLastError(JNIEnv *env, jclass cls) {
     return env->NewStringUTF(g_error_msg);
 }
 
 static JNICALL jlong nativeMakeMaster(JNIEnv *env,
                                       jclass cls,
-                                      jobjectArray tableArr)
-{
+                                      jobjectArray tableArr) {
     int num_tables = env->GetArrayLength(tableArr);
     const char **tables =
         (const char **) malloc(sizeof(const char *) * num_tables);
@@ -233,8 +224,7 @@ static JNICALL jlong nativeMakeMaster(JNIEnv *env,
 }
 
 static JNICALL jboolean nativeSaveMaster(
-    JNIEnv *env, jclass cls, jlong dbPtr, jstring pathStr, jbyteArray keyArr)
-{
+    JNIEnv *env, jclass cls, jlong dbPtr, jstring pathStr, jbyteArray keyArr) {
     sqlite3 *db = (sqlite3 *) (intptr_t) dbPtr;
 
     int key_len = 0;
@@ -260,8 +250,7 @@ static JNICALL jlong nativeLoadMaster(JNIEnv *env,
                                       jstring pathStr,
                                       jbyteArray keyArr,
                                       jobjectArray tableArr,
-                                      jbyteArray outSaltArr)
-{
+                                      jbyteArray outSaltArr) {
     // Path is guaranteed to be non-null by the Java part.
     const char *path = env->GetStringUTFChars(pathStr, nullptr);
 
@@ -315,39 +304,33 @@ static JNICALL jlong nativeLoadMaster(JNIEnv *env,
     return (rc == SQLITERK_OK) ? (jlong)(intptr_t) master : 0;
 }
 
-static JNICALL void nativeFreeMaster(JNIEnv *env, jclass cls, jlong masterPtr)
-{
+static JNICALL void nativeFreeMaster(JNIEnv *env, jclass cls, jlong masterPtr) {
     sqliterk_master_info *master =
         (sqliterk_master_info *) (intptr_t) masterPtr;
     sqliterk_free_master(master);
 }
 
-static JNICALL jint cursorNativeGetColumnCount(JNIEnv *env, jclass, jlong ptr)
-{
+static JNICALL jint cursorNativeGetColumnCount(JNIEnv *env, jclass, jlong ptr) {
     sqliterk_column *column = (sqliterk_column *) (intptr_t) ptr;
     return sqliterk_column_count(column);
 }
 
-static JNICALL jint cursorNativeGetType(JNIEnv *env, jclass, jlong ptr, jint idx)
-{
+static JNICALL jint cursorNativeGetType(JNIEnv *env, jclass, jlong ptr, jint idx) {
     sqliterk_column *column = (sqliterk_column *) (intptr_t) ptr;
     return sqliterk_column_type(column, idx);
 }
 
-static JNICALL jlong cursorNativeGetLong(JNIEnv *env, jclass, jlong ptr, jint idx)
-{
+static JNICALL jlong cursorNativeGetLong(JNIEnv *env, jclass, jlong ptr, jint idx) {
     sqliterk_column *column = (sqliterk_column *) (intptr_t) ptr;
     return sqliterk_column_integer64(column, idx);
 }
 
-static JNICALL double cursorNativeGetDouble(JNIEnv *env, jclass, jlong ptr, jint idx)
-{
+static JNICALL double cursorNativeGetDouble(JNIEnv *env, jclass, jlong ptr, jint idx) {
     sqliterk_column *column = (sqliterk_column *) (intptr_t) ptr;
     return sqliterk_column_number(column, idx);
 }
 
-static JNICALL jstring cursorNativeGetString(JNIEnv *env, jclass, jlong ptr, jint idx)
-{
+static JNICALL jstring cursorNativeGetString(JNIEnv *env, jclass, jlong ptr, jint idx) {
     sqliterk_column *column = (sqliterk_column *) (intptr_t) ptr;
 
     // TODO: handle UTF-8 => UTF-16 convertion
@@ -355,8 +338,7 @@ static JNICALL jstring cursorNativeGetString(JNIEnv *env, jclass, jlong ptr, jin
     return env->NewStringUTF(result);
 }
 
-static JNICALL jbyteArray cursorNativeGetBlob(JNIEnv *env, jclass, jlong ptr, jint idx)
-{
+static JNICALL jbyteArray cursorNativeGetBlob(JNIEnv *env, jclass, jlong ptr, jint idx) {
     sqliterk_column *column = (sqliterk_column *) (intptr_t) ptr;
     const void *arr = sqliterk_column_binary(column, idx);
     int size = sqliterk_column_bytes(column, idx);
@@ -390,35 +372,33 @@ static const JNINativeMethod sCursorMethods[] = {
     {"nativeGetBlob", "(JI)[B", (void *) cursorNativeGetBlob},
 };
 
-static void xlog(sqliterk_loglevel level, int result, const char *msg)
-{
+static void xlog(sqliterk_loglevel level, int result, const char *msg) {
     android_LogPriority lv;
     switch (level) {
-        case sqliterk_loglevel_error:
-            // XXX: thread-safety is not considered here, which may cause problems.
-            g_error_result = result;
-            strlcpy(g_error_msg, msg, sizeof(g_error_msg));
+    case sqliterk_loglevel_error:
+        // XXX: thread-safety is not considered here, which may cause problems.
+        g_error_result = result;
+        strlcpy(g_error_msg, msg, sizeof(g_error_msg));
 
-            lv = ANDROID_LOG_ERROR;
-            break;
-        case sqliterk_loglevel_warning:
-            lv = ANDROID_LOG_WARN;
-            break;
-        case sqliterk_loglevel_info:
-            lv = ANDROID_LOG_INFO;
-            break;
-        case sqliterk_loglevel_debug:
-            lv = ANDROID_LOG_DEBUG;
-            break;
-        default:
-            lv = ANDROID_LOG_VERBOSE;
+        lv = ANDROID_LOG_ERROR;
+        break;
+    case sqliterk_loglevel_warning:
+        lv = ANDROID_LOG_WARN;
+        break;
+    case sqliterk_loglevel_info:
+        lv = ANDROID_LOG_INFO;
+        break;
+    case sqliterk_loglevel_debug:
+        lv = ANDROID_LOG_DEBUG;
+        break;
+    default:
+        lv = ANDROID_LOG_VERBOSE;
     }
 
     wcdb_log_write(lv, "WCDB.RepairKit", msg);
 }
 
-static int register_wcdb_repair(JavaVM *vm, JNIEnv *env)
-{
+static int register_wcdb_repair(JavaVM *vm, JNIEnv *env) {
     char msg[256];
     sqliterk_os os = {xlog};
     sqliterk_register(os);
@@ -430,7 +410,7 @@ static int register_wcdb_repair(JavaVM *vm, JNIEnv *env)
                  "com/tencent/wcdb/repair/RepairKit");
         env->FatalError(msg);
     }
-    
+
     sMID_onProgress = env->GetMethodID(cls, "onProgress", "(Ljava/lang/String;IJ)I");
     if (!sMID_onProgress) {
         snprintf(msg, sizeof(msg),
@@ -452,4 +432,4 @@ static int register_wcdb_repair(JavaVM *vm, JNIEnv *env)
     return 0;
 }
 WCDB_JNI_INIT(DBRepair, register_wcdb_repair)
-}
+} // namespace wcdb

@@ -50,7 +50,7 @@ typedef struct sqlite3_changeset_iter sqlite3_changeset_iter;
 ** is not possible for an application to register a pre-update hook on a
 ** database handle that has one or more session objects attached. Nor is
 ** it possible to create a session object attached to a database handle for
-** which a pre-update hook is already defined. The results of attempting 
+** which a pre-update hook is already defined. The results of attempting
 ** either of these things are undefined.
 **
 ** The session object will be used to create changesets for tables in
@@ -68,13 +68,13 @@ int sqlite3session_create(
 ** CAPI3REF: Delete A Session Object
 ** DESTRUCTOR: sqlite3_session
 **
-** Delete a session object previously allocated using 
+** Delete a session object previously allocated using
 ** [sqlite3session_create()]. Once a session object has been deleted, the
 ** results of attempting to use pSession with any other session module
 ** function are undefined.
 **
 ** Session objects must be deleted before the database handle to which they
-** are attached is closed. Refer to the documentation for 
+** are attached is closed. Refer to the documentation for
 ** [sqlite3session_create()] for details.
 */
 void sqlite3session_delete(sqlite3_session *pSession);

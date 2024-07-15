@@ -28,8 +28,7 @@
 
 namespace wcdb {
 
-static void print_xlog(int prio, const char *msg)
-{
+static void print_xlog(int prio, const char *msg) {
     android_LogPriority level;
     if (prio == MMBAK_LOG_DEBUG)
         level = ANDROID_LOG_DEBUG;
@@ -42,8 +41,7 @@ static void print_xlog(int prio, const char *msg)
 }
 
 static jlong JNICALL BackupKit_nativeInit(
-    JNIEnv *env, jclass cls, jstring outPath, jbyteArray key, jint flags)
-{
+    JNIEnv *env, jclass cls, jstring outPath, jbyteArray key, jint flags) {
     const char *path_ = env->GetStringUTFChars(outPath, nullptr);
     const unsigned char *key_;
     int key_len_;
@@ -69,8 +67,7 @@ static jint JNICALL BackupKit_nativeRun(JNIEnv *env,
                                         jclass cls,
                                         jlong ctxHandle,
                                         jlong dbHandle,
-                                        jobjectArray tableDesc)
-{
+                                        jobjectArray tableDesc) {
     mm_backup_ctx *ctx = (mm_backup_ctx *) (intptr_t) ctxHandle;
     sqlite3 *db = (sqlite3 *) (intptr_t) dbHandle;
 
@@ -118,25 +115,20 @@ static jint JNICALL BackupKit_nativeRun(JNIEnv *env,
     return ret;
 }
 
-static void JNICALL BackupKit_nativeCancel(JNIEnv *env,
-                                           jclass cls,
-                                           jlong ctxHandle)
-{
+static void JNICALL BackupKit_nativeCancel(JNIEnv *env, jclass cls, jlong ctxHandle) {
     mm_backup_ctx *ctx = (mm_backup_ctx *) (intptr_t) ctxHandle;
     mm_backup_cancel(ctx);
 }
 
 static void JNICALL BackupKit_nativeFinish(JNIEnv *env,
                                            jclass cls,
-                                           jlong ctxHandle)
-{
+                                           jlong ctxHandle) {
     mm_backup_ctx *ctx = (mm_backup_ctx *) (intptr_t) ctxHandle;
     mm_backup_finish(ctx);
 }
 
 static jint JNICALL
-BackupKit_nativeStatementCount(JNIEnv *env, jclass cls, jlong ctxHandle)
-{
+BackupKit_nativeStatementCount(JNIEnv *env, jclass cls, jlong ctxHandle) {
     unsigned int stmt_count;
     mm_backup_ctx *ctx = (mm_backup_ctx *) (intptr_t) ctxHandle;
     mm_backup_statistics(ctx, &stmt_count);
@@ -144,8 +136,7 @@ BackupKit_nativeStatementCount(JNIEnv *env, jclass cls, jlong ctxHandle)
 }
 
 static jstring
-BackupKit_nativeLastError(JNIEnv *env, jclass cls, jlong ctxHandle)
-{
+BackupKit_nativeLastError(JNIEnv *env, jclass cls, jlong ctxHandle) {
     mm_backup_ctx *ctx = (mm_backup_ctx *) (intptr_t) ctxHandle;
     const char *errmsg = mm_backup_last_error(ctx);
     return errmsg ? env->NewStringUTF(errmsg) : nullptr;
@@ -154,8 +145,7 @@ BackupKit_nativeLastError(JNIEnv *env, jclass cls, jlong ctxHandle)
 static jlong JNICALL RecoverKit_nativeInit(JNIEnv *env,
                                            jclass cls,
                                            jstring inPath,
-                                           jbyteArray key)
-{
+                                           jbyteArray key) {
     const char *path_ = env->GetStringUTFChars(inPath, nullptr);
     const unsigned char *key_;
     int key_len_;
@@ -177,8 +167,7 @@ static jlong JNICALL RecoverKit_nativeInit(JNIEnv *env,
 }
 
 static jint JNICALL RecoverKit_nativeRun(
-    JNIEnv *env, jclass cls, jlong ctxHandle, jlong dbHandle, jboolean fatal)
-{
+    JNIEnv *env, jclass cls, jlong ctxHandle, jlong dbHandle, jboolean fatal) {
     mm_recover_ctx *ctx = (mm_recover_ctx *) (intptr_t) ctxHandle;
     sqlite3 *db = (sqlite3 *) (intptr_t) dbHandle;
 
@@ -187,24 +176,21 @@ static jint JNICALL RecoverKit_nativeRun(
 
 static void JNICALL RecoverKit_nativeCancel(JNIEnv *env,
                                             jclass cls,
-                                            jlong ctxHandle)
-{
+                                            jlong ctxHandle) {
     mm_recover_ctx *ctx = (mm_recover_ctx *) (intptr_t) ctxHandle;
     mm_recover_cancel(ctx);
 }
 
 static void JNICALL RecoverKit_nativeFinish(JNIEnv *env,
                                             jclass cls,
-                                            jlong ctxHandle)
-{
+                                            jlong ctxHandle) {
     mm_recover_ctx *ctx = (mm_recover_ctx *) (intptr_t) ctxHandle;
     mm_recover_finish(ctx);
 }
 
 static jint JNICALL RecoverKit_nativeSuccessCount(JNIEnv *env,
                                                   jclass cls,
-                                                  jlong ctxHandle)
-{
+                                                  jlong ctxHandle) {
     unsigned int succ = 0;
     mm_recover_ctx *ctx = (mm_recover_ctx *) (intptr_t) ctxHandle;
     mm_recover_statistics(ctx, &succ, nullptr);
@@ -213,8 +199,7 @@ static jint JNICALL RecoverKit_nativeSuccessCount(JNIEnv *env,
 
 static jint JNICALL RecoverKit_nativeFailureCount(JNIEnv *env,
                                                   jclass cls,
-                                                  jlong ctxHandle)
-{
+                                                  jlong ctxHandle) {
     unsigned int fail = 0;
     mm_recover_ctx *ctx = (mm_recover_ctx *) (intptr_t) ctxHandle;
     mm_recover_statistics(ctx, nullptr, &fail);
@@ -222,8 +207,7 @@ static jint JNICALL RecoverKit_nativeFailureCount(JNIEnv *env,
 }
 
 static jstring
-RecoverKit_nativeLastError(JNIEnv *env, jclass cls, jlong ctxHandle)
-{
+RecoverKit_nativeLastError(JNIEnv *env, jclass cls, jlong ctxHandle) {
     mm_recover_ctx *ctx = (mm_recover_ctx *) (intptr_t) ctxHandle;
     const char *errmsg = mm_recover_last_error(ctx);
     return errmsg ? env->NewStringUTF(errmsg) : nullptr;
@@ -250,8 +234,7 @@ static const JNINativeMethod RecoverKit_methods[] = {
      (void *) RecoverKit_nativeLastError},
 };
 
-static int register_wcdb_repair_backup(JavaVM *vm, JNIEnv *env)
-{
+static int register_wcdb_repair_backup(JavaVM *vm, JNIEnv *env) {
     jniRegisterNativeMethods(env, "com/tencent/wcdb/repair/BackupKit",
                              BackupKit_methods, NELEM(BackupKit_methods));
     jniRegisterNativeMethods(env, "com/tencent/wcdb/repair/RecoverKit",

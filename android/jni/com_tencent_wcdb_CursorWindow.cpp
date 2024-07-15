@@ -44,8 +44,7 @@ static struct {
     jfieldID sizeCopied;
 } gCharArrayBufferClassInfo;
 
-static void throwExceptionWithRowCol(JNIEnv *env, jint row, jint column)
-{
+static void throwExceptionWithRowCol(JNIEnv *env, jint row, jint column) {
     char buf[256];
     snprintf(buf, sizeof(buf),
              "Couldn't read row %d, col %d from CursorWindow.  "
@@ -55,16 +54,14 @@ static void throwExceptionWithRowCol(JNIEnv *env, jint row, jint column)
     jniThrowException(env, "java/lang/IllegalStateException", buf);
 }
 
-static void throwUnknownTypeException(JNIEnv *env, jint type)
-{
+static void throwUnknownTypeException(JNIEnv *env, jint type) {
     char buf[128];
     snprintf(buf, sizeof(buf), "UNKNOWN type %d", type);
     jniThrowException(env, "java/lang/IllegalStateException", buf);
 }
 
 static jlong
-nativeCreate(JNIEnv *env, jclass clazz, jstring nameObj, jint cursorWindowSize)
-{
+nativeCreate(JNIEnv *env, jclass clazz, jstring nameObj, jint cursorWindowSize) {
     CursorWindow *window;
     status_t status = CursorWindow::create(cursorWindowSize, &window);
     if (status || !window) {
@@ -78,8 +75,7 @@ nativeCreate(JNIEnv *env, jclass clazz, jstring nameObj, jint cursorWindowSize)
     return (jlong)(intptr_t) window;
 }
 
-static void nativeDispose(JNIEnv *env, jclass clazz, jlong windowPtr)
-{
+static void nativeDispose(JNIEnv *env, jclass clazz, jlong windowPtr) {
     CursorWindow *window = (CursorWindow *) (intptr_t) windowPtr;
     if (window) {
         //LOGV(LOG_TAG,"Closing window %p", window);
@@ -87,8 +83,7 @@ static void nativeDispose(JNIEnv *env, jclass clazz, jlong windowPtr)
     }
 }
 
-static void nativeClear(JNIEnv *env, jclass clazz, jlong windowPtr)
-{
+static void nativeClear(JNIEnv *env, jclass clazz, jlong windowPtr) {
     CursorWindow *window = (CursorWindow *) (intptr_t) windowPtr;
     LOG_WINDOW("Clearing window %p", window);
     status_t status = window->clear();
@@ -97,36 +92,31 @@ static void nativeClear(JNIEnv *env, jclass clazz, jlong windowPtr)
     }
 }
 
-static jint nativeGetNumRows(JNIEnv *env, jclass clazz, jlong windowPtr)
-{
+static jint nativeGetNumRows(JNIEnv *env, jclass clazz, jlong windowPtr) {
     CursorWindow *window = (CursorWindow *) (intptr_t) windowPtr;
     return window->getNumRows();
 }
 
 static jboolean
-nativeSetNumColumns(JNIEnv *env, jclass clazz, jlong windowPtr, jint columnNum)
-{
+nativeSetNumColumns(JNIEnv *env, jclass clazz, jlong windowPtr, jint columnNum) {
     CursorWindow *window = (CursorWindow *) (intptr_t) windowPtr;
     status_t status = window->setNumColumns(columnNum);
     return status == OK;
 }
 
-static jboolean nativeAllocRow(JNIEnv *env, jclass clazz, jlong windowPtr)
-{
+static jboolean nativeAllocRow(JNIEnv *env, jclass clazz, jlong windowPtr) {
     CursorWindow *window = (CursorWindow *) (intptr_t) windowPtr;
     status_t status = window->allocRow(nullptr);
     return status == OK;
 }
 
-static void nativeFreeLastRow(JNIEnv *env, jclass clazz, jlong windowPtr)
-{
+static void nativeFreeLastRow(JNIEnv *env, jclass clazz, jlong windowPtr) {
     CursorWindow *window = (CursorWindow *) (intptr_t) windowPtr;
     window->freeLastRow();
 }
 
 static jint
-nativeGetType(JNIEnv *env, jclass clazz, jlong windowPtr, jint row, jint column)
-{
+nativeGetType(JNIEnv *env, jclass clazz, jlong windowPtr, jint row, jint column) {
     CursorWindow *window = (CursorWindow *) (intptr_t) windowPtr;
     LOG_WINDOW("returning column type affinity for %d,%d from %p", row, column,
                window);

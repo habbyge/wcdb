@@ -28,8 +28,7 @@
 namespace wcdb {
 
 jint android_os_FileUtils_setPermissions(
-    JNIEnv *env, jobject clazz, jstring file, jint mode, jint uid, jint gid)
-{
+    JNIEnv *env, jobject clazz, jstring file, jint mode, jint uid, jint gid) {
     int ret = 0;
     if (!file)
         return ENOENT;
@@ -55,8 +54,7 @@ static const JNINativeMethod methods[] = {
     {"setPermissions", "(Ljava/lang/String;III)I",
      (void *) android_os_FileUtils_setPermissions}};
 
-static int register_wcdb_FileUtils(JavaVM *vm, JNIEnv *env)
-{
+static int register_wcdb_FileUtils(JavaVM *vm, JNIEnv *env) {
     return jniRegisterNativeMethods(env, "com/tencent/wcdb/FileUtils", methods,
                                     NELEM(methods));
 }

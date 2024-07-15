@@ -5482,14 +5482,14 @@ SQLITE_API void sqlite3_result_subtype(sqlite3_context*,unsigned int);
 ** See also:  [sqlite3_collation_needed()] and [sqlite3_collation_needed16()].
 */
 SQLITE_API int sqlite3_create_collation(
-  sqlite3*, 
-  const char *zName, 
-  int eTextRep, 
+  sqlite3*,
+  const char *zName,
+  int eTextRep,
   void *pArg,
   int(*xCompare)(void*,int,const void*,int,const void*)
 );
 SQLITE_API int sqlite3_create_collation_v2(
-  sqlite3*, 
+  sqlite3*,
   const char *zName, 
   int eTextRep, 
   void *pArg,

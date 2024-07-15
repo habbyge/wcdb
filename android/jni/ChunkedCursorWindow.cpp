@@ -27,17 +27,13 @@ namespace wcdb {
 #define CHUNK_NOT_FOUND ((Chunk *) 0)
 
 ChunkedCursorWindow::Chunk::Chunk(CursorWindow *window_, uint32_t startPos_)
-    : window(window_), startPos(startPos_), mRefCount(1)
-{
-}
+    : window(window_), startPos(startPos_), mRefCount(1) {}
 
-ChunkedCursorWindow::Chunk::~Chunk()
-{
+ChunkedCursorWindow::Chunk::~Chunk() {
     delete window;
 }
 
-void ChunkedCursorWindow::Chunk::acquire()
-{
+void ChunkedCursorWindow::Chunk::acquire() {
     int ref = __sync_fetch_and_add(&mRefCount, 1);
     assert(ref > 0);
     (void) ref;
@@ -50,8 +46,7 @@ void ChunkedCursorWindow::Chunk::release()
 }
 
 ChunkedCursorWindow::Chunk *
-ChunkedCursorWindow::Chunk::create(uint32_t startPos_, size_t size)
-{
+ChunkedCursorWindow::Chunk::create(uint32_t startPos_, size_t size) {
     CursorWindow *window;
     status_t ret = CursorWindow::create(size, &window);
     if (ret == OK && window) {
@@ -68,12 +63,9 @@ ChunkedCursorWindow::ChunkedCursorWindow(uint32_t chunkCapacity)
     , mLastWriteChunk(nullptr)
     , mLastWriteChunkRowLimit(__UINT32_MAX__)
     , mCurrentWritingRow(__UINT32_MAX__)
-    , mRowPool(nullptr)
-{
-}
+    , mRowPool(nullptr) {}
 
-ChunkedCursorWindow::~ChunkedCursorWindow()
-{
+ChunkedCursorWindow::~ChunkedCursorWindow() {
     // Release all allocated chunk.
     for (auto it = mChunkMap.begin(); it != mChunkMap.end(); ++it) {
         it->second->release();
@@ -85,9 +77,7 @@ ChunkedCursorWindow::~ChunkedCursorWindow()
     }
 }
 
-status_t ChunkedCursorWindow::create(size_t size,
-                                     ChunkedCursorWindow **outWindow)
-{
+status_t ChunkedCursorWindow::create(size_t size, ChunkedCursorWindow **outWindow) {
     uint32_t capacity = size / CHUNK_SIZE;
     if (size % CHUNK_SIZE > 0)
         capacity++;
@@ -96,8 +86,7 @@ status_t ChunkedCursorWindow::create(size_t size,
     return OK;
 }
 
-ChunkedCursorWindow::Row *ChunkedCursorWindow::allocRowLocked()
-{
+ChunkedCursorWindow::Row *ChunkedCursorWindow::allocRowLocked() {
     // Must be called with mMutex locked.
 
     Row *r;
@@ -111,8 +100,7 @@ ChunkedCursorWindow::Row *ChunkedCursorWindow::allocRowLocked()
     return r;
 }
 
-void ChunkedCursorWindow::recycleRowLocked(ChunkedCursorWindow::Row *row)
-{
+void ChunkedCursorWindow::recycleRowLocked(ChunkedCursorWindow::Row *row) {
     // Must be called with mMutex locked.
 
     assert(row->mPoolNext == nullptr);
@@ -120,14 +108,12 @@ void ChunkedCursorWindow::recycleRowLocked(ChunkedCursorWindow::Row *row)
     mRowPool = row;
 }
 
-size_t ChunkedCursorWindow::capacity() const
-{
+size_t ChunkedCursorWindow::capacity() const {
     AutoMutex lock(mMutex);
     return mChunkCapacity * CHUNK_SIZE;
 }
 
-void ChunkedCursorWindow::capacity(size_t size)
-{
+void ChunkedCursorWindow::capacity(size_t size) {
     AutoMutex lock(mMutex);
 
     uint32_t capacity = size / CHUNK_SIZE;
@@ -136,8 +122,7 @@ void ChunkedCursorWindow::capacity(size_t size)
     mChunkCapacity = capacity;
 }
 
-status_t ChunkedCursorWindow::setNumColumns(uint32_t columns)
-{
+status_t ChunkedCursorWindow::setNumColumns(uint32_t columns) {
     AutoMutex lock(mMutex);
 
     if (columns == mNumColumns)
@@ -151,8 +136,7 @@ status_t ChunkedCursorWindow::setNumColumns(uint32_t columns)
 }
 
 ChunkedCursorWindow::Chunk *
-ChunkedCursorWindow::findChunkByRowLocked(uint32_t row)
-{
+ChunkedCursorWindow::findChunkByRowLocked(uint32_t row) {
     // Must be called with mMutex locked.
 
     // Lookup mLastReadChunk first.
@@ -181,8 +165,7 @@ ChunkedCursorWindow::findChunkByRowLocked(uint32_t row)
 }
 
 ChunkedCursorWindow::Chunk *
-ChunkedCursorWindow::getChunkForWritingLocked(uint32_t row)
-{
+ChunkedCursorWindow::getChunkForWritingLocked(uint32_t row) {
     // Must be called with mMutex locked.
 
     // Lookup mLastWriteChunk first.
@@ -203,8 +186,7 @@ ChunkedCursorWindow::getChunkForWritingLocked(uint32_t row)
 }
 
 ChunkedCursorWindow::Chunk *
-ChunkedCursorWindow::allocChunkLocked(uint32_t startPos)
-{
+ChunkedCursorWindow::allocChunkLocked(uint32_t startPos) {
     // TODO: check capacity.
 
     // Lookup if row to insert already existed.
@@ -239,8 +221,7 @@ ChunkedCursorWindow::allocChunkLocked(uint32_t startPos)
     return chunk;
 }
 
-ChunkedCursorWindow::Chunk *ChunkedCursorWindow::removeChunkLocked(uint32_t row)
-{
+ChunkedCursorWindow::Chunk *ChunkedCursorWindow::removeChunkLocked(uint32_t row) {
     Chunk *chunk;
     ChunkMap::iterator it = mChunkMap.lower_bound(row);
     if (it != mChunkMap.end() && it->first == row) {
@@ -264,9 +245,7 @@ ChunkedCursorWindow::Chunk *ChunkedCursorWindow::removeChunkLocked(uint32_t row)
     return chunk;
 }
 
-ChunkedCursorWindow::Row *ChunkedCursorWindow::newRow(uint32_t row,
-                                                      bool newChunk)
-{
+ChunkedCursorWindow::Row *ChunkedCursorWindow::newRow(uint32_t row, bool newChunk) {
     AutoMutex lock(mMutex);
 
     if (mCurrentWritingRow != __UINT32_MAX__)
@@ -321,8 +300,7 @@ ChunkedCursorWindow::Row *ChunkedCursorWindow::newRow(uint32_t row,
     return rowObj;
 }
 
-ChunkedCursorWindow::Row *ChunkedCursorWindow::getRow(uint32_t row)
-{
+ChunkedCursorWindow::Row *ChunkedCursorWindow::getRow(uint32_t row) {
     AutoMutex lock(mMutex);
 
     if (mCurrentWritingRow == row)
@@ -347,8 +325,7 @@ ChunkedCursorWindow::Row *ChunkedCursorWindow::getRow(uint32_t row)
     return rowObj;
 }
 
-void ChunkedCursorWindow::endRow(ChunkedCursorWindow::Row *row)
-{
+void ChunkedCursorWindow::endRow(ChunkedCursorWindow::Row *row) {
     AutoMutex lock(mMutex);
 
     if (mCurrentWritingRow == row->mRow)
@@ -358,8 +335,7 @@ void ChunkedCursorWindow::endRow(ChunkedCursorWindow::Row *row)
     recycleRowLocked(row);
 }
 
-void ChunkedCursorWindow::rollbackRow(ChunkedCursorWindow::Row *row)
-{
+void ChunkedCursorWindow::rollbackRow(ChunkedCursorWindow::Row *row) {
     AutoMutex lock(mMutex);
 
     if (mCurrentWritingRow == row->mRow) {
@@ -371,8 +347,7 @@ void ChunkedCursorWindow::rollbackRow(ChunkedCursorWindow::Row *row)
     recycleRowLocked(row);
 }
 
-status_t ChunkedCursorWindow::clear()
-{
+status_t ChunkedCursorWindow::clear() {
     AutoMutex lock(mMutex);
 
     ChunkMap::iterator it;
@@ -391,8 +366,7 @@ status_t ChunkedCursorWindow::clear()
 
 status_t ChunkedCursorWindow::removeChunk(uint32_t row,
                                           uint32_t &outStart,
-                                          uint32_t &outEnd)
-{
+                                          uint32_t &outEnd) {
     AutoMutex lock(mMutex);
 
     Chunk *chunk = removeChunkLocked(row);

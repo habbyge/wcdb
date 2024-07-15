@@ -28,8 +28,7 @@
 namespace wcdb {
 
 static jlong
-nativeGetLong(JNIEnv *env, jclass cls, jlong statementPtr, jint column)
-{
+nativeGetLong(JNIEnv *env, jclass cls, jlong statementPtr, jint column) {
     sqlite3_stmt *stmt = (sqlite3_stmt *) (intptr_t) statementPtr;
     return sqlite3_column_int64(stmt, column);
 }
